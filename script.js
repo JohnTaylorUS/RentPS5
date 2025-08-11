@@ -10,35 +10,44 @@ async function checkAuth() {
     const password = document.getElementById('password').value.trim();
     let isValid = true;
 
+    // Сброс предыдущих ошибок
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('password-error').style.display = 'none';
+
     // Валидация полей
     if (!login) {
         document.getElementById('login-error').style.display = 'block';
         isValid = false;
-    } else {
-        document.getElementById('login-error').style.display = 'none';
     }
 
     if (!password) {
         document.getElementById('password-error').style.display = 'block';
         isValid = false;
-    } else {
-        document.getElementById('password-error').style.display = 'none';
     }
 
     if (!isValid) return;
 
     try {
-        // Отправка данных в Apps Script
-        const response = await fetch('https://script.google.com/macros/s/AKfycbx36NSqqsEB_w0_XGuECjGQ1A78-FZAKvzID4ZRxn4gzsYZXNMZzzdRybquSUCmTCFCtg/exec/auth', {
+        // URL с добавленным параметром для CORS
+        const AUTH_URL = 'https://script.google.com/macros/s/AKfycbx36NSqqsEB_w0_XGuECjGQ1A78-FZAKvzID4ZRxn4gzsYZXNMZzzdRybquSUCmTCFCtg/exec/auth?cors=true';
+
+        // Отправка данных с обработкой CORS
+        const response = await fetch(AUTH_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Origin': window.location.origin
             },
             body: JSON.stringify({
                 login: login,
                 password: password
-            })
+            }),
+            mode: 'cors'
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const result = await response.json();
 
@@ -49,7 +58,10 @@ async function checkAuth() {
             alert('Ошибка: Неверный логин или пароль');
         }
     } catch (error) {
-        console.error('Ошибка сети:', error);
-        alert('Произошла ошибка при подключении к серверу');
+        console.error('Ошибка:', {
+            message: error.message,
+            stack: error.stack
+        });
+        alert('Ошибка подключения: Проверьте консоль для деталей (F12)');
     }
 }
