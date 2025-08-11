@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Система управления арендой</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .hidden { display: none; }
+        .login-form { margin: 30px 0; }
+        input[type="email"] {
+            padding: 12px;
+            width: 300px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Система управления арендой</h1>
+    
+    <div id="login-screen">
+        <div class="login-form">
+            <input type="email" id="email-input" placeholder="Введите ваш email">
+            <div>
+                <button onclick="login()">Войти</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="admin-panel" class="hidden">
+        <h2>Добро пожаловать!</h2>
+        <button onclick="window.location.href='form.html'">Добавить арендатора</button>
+    </div>
+
+    <script>
+        function login() {
+            const email = document.getElementById('email-input').value;
+            if(email === "localgladiator@gmail.com") {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+            } else {
+                alert("Доступ разрешен только администратору");
+            }
+        }
+    </script>
+</body>
+</html>

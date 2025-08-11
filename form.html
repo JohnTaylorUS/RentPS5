@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить арендатора</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background: #34a853;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .required::after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Добавить нового арендатора</h1>
+    
+    <form id="tenant-form">
+        <div class="form-group">
+            <label class="required">ФИО</label>
+            <input type="text" name="fullName" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Дата рождения</label>
+            <input type="date" name="birthDate" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Телефон</label>
+            <input type="tel" name="phone" placeholder="+7 (999) 999-99-99" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Адрес</label>
+            <input type="text" name="address" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Количество дней аренды</label>
+            <input type="number" name="days" min="1" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Время начала аренды</label>
+            <input type="datetime-local" name="startTime" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Скидка (%)</label>
+            <input type="number" name="discount" min="0" max="100" value="0">
+        </div>
+        
+        <div class="form-group">
+            <label>Стоимость доставки</label>
+            <input type="number" name="delivery" min="0" value="0">
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Залог</label>
+            <input type="number" name="deposit" min="0" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="required">Неисправности до аренды</label>
+            <textarea name="issues" rows="4" required></textarea>
+        </div>
+        
+        <button type="submit">Отправить данные</button>
+    </form>
+
+    <script>
+        const SCRIPT_URL = "ВАШ_URL_ВЕБ_ПРИЛОЖЕНИЯ_APPS_SCRIPT";
+        
+        document.getElementById('tenant-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if(result.success) {
+                    alert('Данные успешно сохранены!');
+                    e.target.reset();
+                } else {
+                    alert('Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                alert('Сетевая ошибка: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
