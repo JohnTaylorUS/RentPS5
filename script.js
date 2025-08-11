@@ -8,41 +8,36 @@ document.addEventListener('DOMContentLoaded', () => {
 async function checkAuth() {
     const login = document.getElementById('login').value.trim();
     const password = document.getElementById('password').value.trim();
-    let isValid = true;
-
-    // Сброс предыдущих ошибок
+    
+    // Сброс ошибок
     document.getElementById('login-error').style.display = 'none';
     document.getElementById('password-error').style.display = 'none';
 
-    // Валидация полей
+    // Валидация
     if (!login) {
         document.getElementById('login-error').style.display = 'block';
-        isValid = false;
+        return;
     }
-
     if (!password) {
         document.getElementById('password-error').style.display = 'block';
-        isValid = false;
+        return;
     }
 
-    if (!isValid) return;
-
     try {
-        // URL с добавленным параметром для CORS
-        const AUTH_URL = 'https://script.google.com/macros/s/AKfycbx36NSqqsEB_w0_XGuECjGQ1A78-FZAKvzID4ZRxn4gzsYZXNMZzzdRybquSUCmTCFCtg/exec/auth?cors=true';
+        // Отправка preflight запроса
+        await fetch('https://script.google.com/macros/s/AKfycbx3GMSqqsEB_w0_XGuECjGQIA78-FZAKvz-/exec?cors=true', {
+            method: 'OPTIONS'
+        });
 
-        // Отправка данных с обработкой CORS
-        const response = await fetch(AUTH_URL, {
+        // Основной запрос
+        const response = await fetch('https://script.google.com/macros/s/AKfycbx3GMSqqsEB_w0_XGuECjGQIA78-FZAKvz-/exec/auth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Origin': window.location.origin
             },
-            body: JSON.stringify({
-                login: login,
-                password: password
-            }),
-            mode: 'cors'
+            body: JSON.stringify({ login, password }),
+            credentials: 'omit'
         });
 
         if (!response.ok) {
@@ -50,18 +45,18 @@ async function checkAuth() {
         }
 
         const result = await response.json();
-
+        
         if (result.success) {
             localStorage.setItem('isAuthenticated', 'true');
             window.location.href = 'form.html';
         } else {
-            alert('Ошибка: Неверный логин или пароль');
+            alert('Неверный логин или пароль');
         }
     } catch (error) {
-        console.error('Ошибка:', {
+        console.error('Ошибка запроса:', {
             message: error.message,
             stack: error.stack
         });
-        alert('Ошибка подключения: Проверьте консоль для деталей (F12)');
+        alert('Ошибка подключения. Проверьте консоль (F12)');
     }
 }
