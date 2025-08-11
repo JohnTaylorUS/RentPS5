@@ -29,7 +29,7 @@ async function checkAuth() {
 
     try {
         // Отправка данных в Apps Script
-        const response = await fetch('https://script.google.com/macros/s/AKfycbx36NSqqsEB_w0_XGuECjGQ1A78-FZAKvzID4ZRxn4gzsYZXNMZzzdRybquSUCmTCFCtg/exec', {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbx36NSqqsEB_w0_XGuECjGQ1A78-FZAKvzID4ZRxn4gzsYZXNMZzzdRybquSUCmTCFCtg/exec/auth', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
