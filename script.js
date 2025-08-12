@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Проверка авторизации
     if (localStorage.getItem('isAuthenticated') === 'true') {
         window.location.href = 'form.html';
     }
 });
 
-function checkAuth() {
+async function checkAuth() {
     const login = document.getElementById('login').value.trim();
     const password = document.getElementById('password').value.trim();
     
@@ -22,53 +23,53 @@ function checkAuth() {
         return;
     }
 
-    // Создаем уникальное имя функции для JSONP
-    const callbackName = 'authCallback_' + Date.now();
-    
-    // Создаем script тег для JSONP запроса
-    const script = document.createElement('script');
-    script.src = `https://script.google.com/macros/s/AKfycbx3GMSqqsEB_w0_XGuECjGQIA78-FZAKvz-/exec` +
-                 `?callback=${callbackName}` +
-                 `&path=auth` +
-                 `&login=${encodeURIComponent(login)}` +
-                 `&password=${encodeURIComponent(password)}`;
-    
-    // Создаем функцию обработчика
-    window[callbackName] = function(response) {
-        // Удаляем временную функцию
-        delete window[callbackName];
-        document.body.removeChild(script);
+    try {
+        // Используем прокси для обхода CORS
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3GMSqqsEB_w0_XGuECjGQIA78-FZAKvz-/exec/auth';
         
-        if (response.success) {
+        const response = await fetch(PROXY_URL + SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ login, password })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
             localStorage.setItem('isAuthenticated', 'true');
             window.location.href = 'form.html';
         } else {
             alert('Неверный логин или пароль');
         }
-    };
-    
-    // Обработка ошибок
-    script.onerror = function() {
-        delete window[callbackName];
-        document.body.removeChild(script);
-        alert('Ошибка подключения к серверу');
-    };
-    
-    // Добавляем script на страницу
-    document.body.appendChild(script);
+    } catch (error) {
+        console.error('Ошибка запроса:', error);
+        alert('Ошибка подключения: ' + error.message);
+    }
 }
 
-// Для формы отправки данных
+// Для формы
 async function submitForm() {
     const form = document.getElementById('tenant-form');
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     
     try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbx3GMSqqsEB_w0_XGuECjGQIA78-FZAKvz-/exec', {
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3GMSqqsEB_w0_XGuECjGQIA78-FZAKvz-/exec';
+        
+        const response = await fetch(PROXY_URL + SCRIPT_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
             body: JSON.stringify(data)
         });
